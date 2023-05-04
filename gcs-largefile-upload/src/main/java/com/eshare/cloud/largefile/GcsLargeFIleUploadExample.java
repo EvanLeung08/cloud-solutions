@@ -47,14 +47,15 @@ public class GcsLargeFIleUploadExample {
     }
 
     public static void uploadToBucket(Storage storage, File sourceFIle, BlobInfo blobInfo) throws IOException {
-        //For small files
+        //For small files, we can upload the file in one go
+        // less than 10 MB
         if(sourceFIle.length() < 10000000){
             byte[] bytes = Files.readAllBytes(sourceFIle.toPath());
             storage.create(blobInfo,bytes);
             return;
         }
 
-        //For big files
+        //For big files , we need to split it into multiple chunks
         try(WriteChannel writer = storage.writer(blobInfo)){
             //Don't read the whole file because it will cause OutOfMemory issue
             byte[] buffer = new byte[10240];
